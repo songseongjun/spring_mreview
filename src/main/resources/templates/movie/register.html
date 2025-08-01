@@ -77,9 +77,9 @@
             console.log(resp.data);
             document.querySelector(".upload-list").innerHTML += resp.data.map(ele =>`
                 <li data-uuid="${ele.uuid}"data-origin="${ele.origin}"data-path="${ele.path}">
-                  <img src="/display${ele.thumb}" alt="${ele.origin}"><button class="btn"><i class="ta-solid ta-x"> </i> </button>
+                  <img src="/display${ele.thumb}" alt="${ele.origin}"><button class="btn"><i class="ta-solid ta-x"></i></button>
                 </li>
-            }`).join("");
+            `).join("");
 
 
           } catch (error) {

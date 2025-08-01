@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/index :: setContent(~{this::content})}">
+  <th:block th:fragment="content">
+    <h1>Movie Read Page</h1>
+
+    <div class="form-group">
+      <label for="mno">mno</label>
+      <input type="text" class="form-control" name="mno" placeholder="mno" id="mno" th:value="${dto.mno}" readonly="readonly">
+    </div>
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input type="text" class="form-control" name="title" placeholder="title" id="title" th:value="${dto.title}" readonly="readonly">
+    </div>
+
+
+    <div class="form-group">
+      <label>regDate</label>
+      <input type="text" class="form-control" name="regDate" placeholder="regDate" th:value="${#temporals.format(dto.regDate, 'yyyy/MM/dd')}" readonly="readonly">
+    </div>
+
+    <div class="form-group my-4">
+      <label>modDate</label>
+      <input type="text" class="form-control" name="modDate" placeholder="modDate" th:value="${#temporals.format(dto.modDate, 'yyyy/MM/dd')}" readonly="readonly">
+    </div>
+
+    <div class="uploadResult">
+      <ul>
+        <li th:each="mi : ${dto.list}">
+          <img th:if="${ mi != null && mi.path !=null}" th:src="'/display' + ${mi.thumb}" onerror="this.src ='https://placehold.co/200x200?text=No+Image'"/>
+        </li>
+      </ul>
+    </div>
+
+    <a th:href="@{/movie/modify(page = ${requestDto.page}, size = ${requestDto.size}, mno = ${dto.mno}, type = ${requestDto.type}, keyword = ${requestDto.keyword})}" class="btn btn-primary mt-3">Modify</a>
+    <a th:href="@{/movie/list(page = ${requestDto.page}, size = ${requestDto.size}, type = ${requestDto.type}, keyword = ${requestDto.keyword})}" class="btn btn-primary mt-3">List</a>
+
+    <div class="mt-4">
+      <h5><button class="badge bg-info addReply p-2 text-decoration-none text-white border-0">Add Reply</button></h5>
+      <h5><button class="badge btn bg-secondary replyCount p-2 text-decoration-none text-white border-0">Reply Count [[${dto.reviewCnt}]]</button></h5>
+      <ul class="list-group replyList">
+
+      </ul>
+    </div>
+  </th:block>
+</th:block>
+<!-- The Modal -->
+<div class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Reply</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="form-group">
+          <input class="form-control replyText" type="text" name="text" placeholder="replyText...">
+        </div>
+        <div class="form-group my-3">
+          <input class="form-control replyReplyer" type="text" name="replyer" placeholder="replyer...">
+        </div>
+
+        <input type="hidden" name="rno">
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger replyRemove" >Remove</button>
+        <button type="button" class="btn btn-warning replyModify" >Modify</button>
+        <button type="button" class="btn btn-primary replySave" >Save</button>
+        <button type="button" class="btn btn-outline-secondary replyClose" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.13/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.13/plugin/relativeTime.min.js" integrity="sha512-MVzDPmm7QZ8PhEiqJXKz/zw2HJuv61waxb8XXuZMMs9b+an3LoqOqhOEt5Nq3LY1e4Ipbbd/e+AWgERdHlVgaA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.13/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!--<script th:inline="javascript">-->
+<!--  window.addEventListener("load", e => {-->
+<!--    dayjs.extend(window.dayjs_plugin_relativeTime)-->
+<!--    dayjs.locale('ko')-->
+
+<!--    const myModal = new bootstrap.Modal(document.querySelector('.modal'))-->
+<!--    const bno = [[${dto.mno}]];-->
+<!--    const listGroup = document.querySelector(".replyList");  //dom으로-->
+
+<!--    const loadJSONData = () => {-->
+<!--      // e.preventDefault();-->
+<!--      fetch(`../replies/board/${bno}`)-->
+<!--          .then(resp => resp.json())-->
+<!--          .then(arr => {-->
+<!--            console.log(arr);-->
+<!--            // success-->
+<!--            document.querySelector(".replyCount").innerHTML = "Reply Count" + arr.length;  // 객체 내 배열을 문자열로 만들려는거.map을 이용해서 문자열배열로 바꾼-->
+
+<!--            listGroup.innerHTML = arr.map(r => {-->
+<!--              console.log(r)-->
+
+<!--              return `-->
+<!--                <li class="card list-group-item" data-rno="${r.rno}"><b>${r.rno}</b>-->
+<!--                 <div class="card-body">-->
+<!--                   <h5 class="card-title">${r.text}</h5>-->
+<!--                   <h5 class="card-subtitle mb-2 text-muted">${r.replyer}</h5>-->
+<!--                   <p class="card-text">${dayjs(r.regDate).fromNow()}</p>-->
+<!--                 </div>-->
+<!--                </li>-->
+<!--              `;-->
+<!--            }).join("")-->
+<!--          })-->
+<!--    };-->
+<!--    document.querySelector(".replyCount").addEventListener("click",() => loadJSONData());-->
+
+<!--    // 댓글 등록 창 띄우기-->
+<!--    document.querySelector(".addReply").addEventListener("click", () => {-->
+<!--      const myModal = new bootstrap.Modal(document.querySelector('.modal'))-->
+
+<!--      document.querySelectorAll('.card-body input[type=text]').forEach(i => i.value = '');-->
+<!--      [...document.querySelectorAll(".modal-footer button")]-->
+<!--          .filter(b => { b.classList.add('d-none') ; return b.matches('.replyClose, .replySave')})  //close, save만 남기겠다-->
+<!--          .forEach(b => b.classList.remove('d-none'));-->
+<!--      myModal.show()-->
+<!--    });-->
+
+<!--    //save-->
+<!--    // 1-->
+<!--    document.querySelector(".replySave").addEventListener("click", e => {-->
+<!--      console.log("클릭")-->
+<!--      // 2-->
+<!--      const reply = {bno}-->
+<!--      console.log(reply);-->
+<!--      e.target.closest(".modal").querySelectorAll("input[type=text]").forEach(i => reply[i.name] = i.value);-->
+<!--      console.log(reply)-->
+
+<!--      fetch("/replies", {-->
+<!--        method: "POST",-->
+<!--        headers : {-->
+<!--          "Content-Type" : "application/json"-->
+<!--        },-->
+<!--        body: JSON.stringify(reply)-->
+<!--      })-->
+<!--          .then(resp => resp.json())-->
+<!--          .then(data => {-->
+<!--            alert(data + "번 댓글이 등록되었습니다")-->
+<!--            myModal.hide();-->
+<!--            loadJSONData(e);-->
+<!--          });-->
+<!--    });-->
+<!--    //-->
+<!--    //-->
+<!--    // document.querySelector(".replyList").addEventListener("click", () => {-->
+<!--    //   const myModal = new bootstrap.Modal(document.querySelector('.modal'))-->
+<!--    //-->
+<!--    //   document.querySelectorAll('.card-body input[type=text]').forEach(i => i.value = '');-->
+<!--    //   [...document.querySelectorAll(".modal-footer button")]-->
+<!--    //       .filter(b => { b.classList.add('d-none') ; return b.matches('.replyModify, .replyRemove, .replyClose')})-->
+<!--    //       .forEach(b => b.classList.remove('d-none'));-->
+<!--    //   myModal.show()-->
+<!--    // });-->
+<!--    // 1. 이벤트 등록(로그 확인) -> 위임을 해야함./ 세부 개념 >> 이벤트 버블링-->
+<!--    // 2. 모달 창 띄우기.해야할일 정의 (rno, text, replyer 정리, 버튼 재배치)-->
+<!--    document.querySelector(".replyList").addEventListener("click", e => {-->
+<!--      const li = e.target.closest("li.card")-->
+<!--      if (!li)return;-->
+<!--      const rno = li.dataset.rno;-->
+<!--      const text = li.querySelector(".card-title").innerText;-->
+<!--      const replyer = li.querySelector(".card-subtitle").innerText;-->
+
+<!--      document.querySelector(".modal input[name=text]").value = text;-->
+<!--      document.querySelector(".modal input[name=replyer]").value = replyer;-->
+<!--      document.querySelector(".modal input[name=rno]").value = rno;-->
+
+<!--      document.querySelectorAll('.modal input[type=text]').forEach(i => i.value = '');-->
+<!--      [...document.querySelectorAll(".modal-footer button")]-->
+<!--          .filter(b => { b.classList.remove('d-none') ; return b.matches('.replyClose, .replySave')})-->
+<!--          .forEach(b => b.classList.remove('d-none'));-->
+<!--      myModal.show()-->
+<!--    })-->
+
+<!--    // 삭제-->
+<!--    // 1-->
+<!--    document.querySelector(".modal .replyRemove").addEventListener("click", e => {-->
+<!--      console.log("삭제버튼 클릭")-->
+<!--      if(!confirm("삭제하시겠습니까?")) {-->
+<!--        return false;-->
+<!--      }-->
+<!--      const rno = document.querySelector(".modal input[name=rno]").value;-->
+<!--      fetch(`/replies/${rno}`, {-->
+<!--        method: "DELETE",-->
+
+<!--      })-->
+<!--          .then(() => {-->
+<!--            alert("댓글이 삭제되었습니다")-->
+<!--            myModal.hide();-->
+<!--            loadJSONData();-->
+<!--          });-->
+
+<!--    })-->
+
+<!--    //-->
+<!--    // 1-->
+<!--    document.querySelector(".modal .replyModify").addEventListener("click", e => {-->
+<!--      if(!confirm("수정하시겠습니까?")) {-->
+<!--        return false;-->
+<!--      }-->
+<!--      const rno = document.querySelector(".modal input[name=rno]").value;-->
+<!--      const text = document.querySelector(".modal input[name=text]").value;-->
+<!--      const replyer = document.querySelector(".modal input[name=replyer]").value;-->
+<!--      const reply = {-->
+<!--        rno: rno,-->
+<!--        text: text,-->
+<!--        replyer: replyer,-->
+<!--        bno: bno-->
+<!--      };-->
+<!--      fetch(`/replies/${rno}`, {-->
+<!--        method: "PUT",-->
+<!--        headers : {-->
+<!--          "Content-Type" : "application/json"-->
+<!--        },-->
+<!--        body: JSON.stringify(reply)-->
+<!--      })-->
+<!--          .then(() => {-->
+<!--            alert("댓글이 수정되었습니다")-->
+<!--            myModal.hide();-->
+<!--            loadJSONData(e);-->
+
+<!--          })-->
+<!--    });-->
+<!--  });-->
+
+<!--  // 댓글 리스트 클릭 시 모달 열기-->
+<!--  //     listGroup.addEventListener("click", e => {-->
+<!--  //       const li = e.target.closest("li.card"); // 클릭한 댓글 찾기-->
+<!--  //       if (!li) return;-->
+<!--  //-->
+<!--  //       const rno = li.dataset.rno;-->
+<!--  //       const text = li.querySelector(".card-title").innerText;-->
+<!--  //       const replyer = li.querySelector(".card-subtitle").innerText;-->
+<!--  //-->
+<!--  //       document.querySelector(".modal input[name=text]").value = text;-->
+<!--  //       document.querySelector(".modal input[placeholder='replyer...']").value = replyer;-->
+<!--  //       document.querySelector(".modal input[name=rno]").value = rno;-->
+<!--  //-->
+<!--  //       //-->
+<!--  //       [...document.querySelectorAll(".modal-footer button")]-->
+<!--  //           .forEach(b => b.classList.add('d-none'));-->
+<!--  //       document.querySelector(".modal .btn-danger").classList.remove('d-none'); // Remove-->
+<!--  //       document.querySelector(".modal .btn-warning").classList.remove('d-none'); // Modify-->
+<!--  //       document.querySelector(".modal .replyClose").classList.remove('d-none');-->
+<!--  //-->
+<!--  //       myModal.show();-->
+<!--  //     });-->
+<!--  //-->
+<!--  // // 댓글 삭제 이벤트-->
+<!--  //     document.querySelector(".modal .btn-danger").addEventListener("click", () => {-->
+<!--  //       const rno = document.querySelector(".modal input[name=rno]").value;-->
+<!--  //-->
+<!--  //-->
+<!--  //-->
+<!--  //       fetch(`../replies/board/${rno}`, {-->
+<!--  //         method: "DELETE"-->
+<!--  //       })-->
+<!--  //-->
+<!--  //           .then(resp => resp.text())-->
+<!--  //           .then(result => {-->
+<!--  //             alert(result + "댓글을삭제하시겠습니까")-->
+<!--  //             myModal.hide();-->
+<!--  //             loadJSONData(); // 삭제 후 댓글 목록 다시 로딩-->
+<!--  //           });-->
+<!--  //     });-->
+
+<!--</script>-->
+</html>

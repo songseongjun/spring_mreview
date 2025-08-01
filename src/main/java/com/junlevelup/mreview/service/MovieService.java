@@ -16,6 +16,7 @@ public sealed interface MovieService permits MovieServiceImpl {
 
   PageResponseDTO<MovieDTO, Object[]> getlist(PageRequestDTO dto);
 
+  public MovieDTO get(Long mno);
 
  default Map<String, Object> toEntity(MovieDTO dto){
     Map<String, Object> map = new HashMap<>();

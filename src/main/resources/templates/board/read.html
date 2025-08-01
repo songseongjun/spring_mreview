@@ -2,11 +2,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{/layout/index :: setContent(~{this::content})}">
   <th:block th:fragment="content">
-    <h1>Board Read Page</h1>
+    <h1>movie Read Page</h1>
 
     <div class="form-group">
-      <label for="bno">bno</label>
-      <input type="text" class="form-control" name="bno" placeholder="bno" id="bno" th:value="${dto.bno}" readonly="readonly">
+      <label for="mno">mno</label>
+      <input type="text" class="form-control" name="mno" placeholder="mno" id="mno" th:value="${dto.mno}" readonly="readonly">
     </div>
     <div class="form-group">
       <label for="title">Title</label>
@@ -29,8 +29,8 @@
       <label>modDate</label>
       <input type="text" class="form-control" name="modDate" placeholder="modDate" th:value="${#temporals.format(dto.modDate, 'yyy/MM/dd')}" readonly="readonly">
     </div>
-    <a th:href="@{/board/modify(page = ${requestDto.page}, size = ${requestDto.size}, bno = ${dto.bno}, type = ${requestDto.type}, keyword = ${requestDto.keyword})}" class="btn btn-primary mt-3">Modify</a>
-    <a th:href="@{/board/list(page = ${requestDto.page}, size = ${requestDto.size}, type = ${requestDto.type}, keyword = ${requestDto.keyword})}" class="btn btn-primary mt-3">List</a>
+    <a th:href="@{/movie/modify(page = ${requestDto.page}, size = ${requestDto.size}, mno = ${dto.mno}, type = ${requestDto.type}, keyword = ${requestDto.keyword})}" class="btn btn-primary mt-3">Modify</a>
+    <a th:href="@{/movie/list(page = ${requestDto.page}, size = ${requestDto.size}, type = ${requestDto.type}, keyword = ${requestDto.keyword})}" class="btn btn-primary mt-3">List</a>
 
     <div class="mt-4">
       <h5><button class="badge bg-info addReply p-2 text-decoration-none text-white border-0">Add Reply</button></h5>
@@ -84,12 +84,12 @@
     dayjs.locale('ko')
 
     const myModal = new bootstrap.Modal(document.querySelector('.modal'))
-    const bno = [[${dto.bno}]];
+    const mno = [[${dto.mno}]];
     const listGroup = document.querySelector(".replyList");  //dom으로
 
     const loadJSONData = () => {
       // e.preventDefault();
-      fetch(`../replies/board/${bno}`)
+      fetch(`../replies/movie/${mno}`)
           .then(resp => resp.json())
           .then(arr => {
             console.log(arr);
@@ -129,7 +129,7 @@
     document.querySelector(".replySave").addEventListener("click", e => {
       console.log("클릭")
       // 2
-      const reply = {bno}
+      const reply = {mno}
       console.log(reply);
       e.target.closest(".modal").querySelectorAll("input[type=text]").forEach(i => reply[i.name] = i.value);
       console.log(reply)
@@ -212,7 +212,7 @@
         rno: rno,
         text: text,
         replyer: replyer,
-        bno: bno
+        mno: mno
       };
       fetch(`/replies/${rno}`, {
         method: "PUT",
@@ -259,7 +259,7 @@
   //
   //
   //
-  //       fetch(`../replies/board/${rno}`, {
+  //       fetch(`../replies/movie/${rno}`, {
   //         method: "DELETE"
   //       })
   //
